@@ -1,12 +1,13 @@
 {
   "host": "localhost",
-  "port": 3030,
+  "port": 3031,
   "mongodb": "mongodb://localhost:27017/jfpdata",
   "public": "../public/",
   "auth": {
     "token": {
       "secret": "wAyAmR1vq/7yegSPfx/TsBb5mFWriNFBaAHX2crzCQh36EYMhCzuQLFWKyKQ4rMqJGG/aQXyzWHcLCqPRsNpjQ=="
     },
-    "local": {}
+    "local": {},
+    "successRedirect": "/"
   }
 }
