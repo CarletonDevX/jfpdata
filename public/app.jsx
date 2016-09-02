@@ -8,35 +8,58 @@ const app = feathers()
     storage: window.localStorage
   }));
 
+const MainComponent = React.createClass({
+  getInitialState() {
+    app.service('jobs').find({}).then(res => this.setState({ jobs: res.data }));
+    return {jobs: []};
+  },
+  addJob(job) {
+    app.service('jobs').create(job).then(job => {
+      var jobs = this.state.jobs;
+      jobs.push(job);
+      this.setState({ jobs: jobs });
+    });
+  },
+  render() {
+    return (
+      <div>
+        <h1 className="title"> JFP Data </h1>
+        <JobTable jobs={this.state.jobs}/>
+        <PrinterConsole onSubmit={this.addJob}/>
+      </div>
+    );
+  }
+});
+
 const JobTable = React.createClass({
-    getInitialState() {
-      app.service('jobs').find({}).then(res => this.setState({ jobs: res.data }));
-      return {jobs: []};
-    },
-    render() {
-      return (
-        <table>
-          <thead>
-            <tr>
-              <th>Printer</th>
-              <th>Copies</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.jobs.map((job, index) => {
-              return (
-                <tr key={index}>
-                    <td>{job.printer}</td>
-                    <td>{job.copies}</td>
-                    <td>{job.createdAt}</td>
-                </tr>
-              );
-            }, this)}
-          </tbody>
-        </table>
-      );
-    }
+  formatTime(date) {
+    var date = new Date(date);
+    return `${date.getHours()}:${date.getMinutes()} ${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`
+  },
+  render() {
+    return (
+      <table className="printer-table pure-table pure-table-striped">
+        <thead>
+          <tr>
+            <th>Printer</th>
+            <th>Copies</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.props.jobs.map((job, index) => {
+            return (
+              <tr key={index}>
+                  <td>{job.printer}</td>
+                  <td>{job.copies}</td>
+                  <td>{this.formatTime(job.createdAt)}</td>
+              </tr>
+            );
+          }, this)}
+        </tbody>
+      </table>
+    );
+  }
 });
 
 const PrinterConsole = React.createClass({
@@ -52,30 +75,31 @@ const PrinterConsole = React.createClass({
   updateCopies(ev) {
     this.setState({ copies: Number(ev.target.value) });
   },
-  addPrinter(ev) {
-    app.service('jobs').create({
-      printer: this.state.printer,
-      success: this.state.success,
-      copies: this.state.copies,
-    }).then(() => this.setState(this.getInitialState()));
+  submit(ev) {
+    this.props.onSubmit(this.state);
     ev.preventDefault();
   },
   render() {
     return (
-      <form className="flex flex-row flex-space-between" onSubmit={this.addPrinter}>
-        <input type="text" name="printer" className="flex flex-1" value={this.state.printer} onChange={this.updatePrinter} />
-        <input type="number" name="success" className="flex flex-1" value={this.state.success} onChange={this.updateSuccess} />
-        <input type="number" name="copies" className="flex flex-1" value={this.state.copies} onChange={this.updateCopies} />
-        <button className="button-primary" type="submit">Send</button>
+      <form className="pure-form pure-form-stacked" onSubmit={this.submit}>
+        <fieldset>
+          <legend>Enter A Job</legend>
+          <label for="printer">Printer</label>
+          <input type="text" name="printer" className="flex flex-1" value={this.state.printer} onChange={this.updatePrinter} />
+          <label for="success">Successful</label>
+          <input type="number" name="success" className="flex flex-1" value={this.state.success} onChange={this.updateSuccess} />
+          <label for="copies">Copies</label>
+          <input type="number" name="copies" className="flex flex-1" value={this.state.copies} onChange={this.updateCopies} />
+          <button className="button-primary pure-button" type="submit">Send</button>
+        </fieldset>
       </form>
     );
   }
 });
 
 app.authenticate().then(() => {
-  ReactDOM.render(<div id="app" className="flex flex-column">
-    <JobTable />
-    <PrinterConsole />
+  ReactDOM.render(<div>
+    <MainComponent />
   </div>, document.querySelector("#container"));
 }).catch(error => {
   if(error.code === 401) {
