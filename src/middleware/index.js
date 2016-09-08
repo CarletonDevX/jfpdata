@@ -1,5 +1,6 @@
 'use strict';
 
+const addJob = require('./addJob');
 const handler = require('feathers-errors/handler');
 const notFound = require('./not-found-handler');
 const logger = require('./logger');
@@ -9,6 +10,8 @@ module.exports = function() {
   // just like Express the order matters, so error
   // handling middleware should go last.
   const app = this;
+
+  app.post('/add', addJob(app));
 
   app.use(notFound());
   app.use(logger(app));
