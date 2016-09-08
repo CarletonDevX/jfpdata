@@ -1,0 +1,21 @@
+#container {
+  width: 30em;
+  margin: 0 auto;
+  margin-top: 2em;
+  background-color: #BBB;
+  padding: 2em;
+}
+.title {
+  text-align: center;
+}
+.printer-table {
+  width: 100%;
+  background-color: white;
+}
+.printer-table-container {
+  height: 20em;
+  overflow: auto;
+}
+.error-job {
+  color: red;
+}
