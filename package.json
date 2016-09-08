@@ -16,10 +16,8 @@
     "node": ">= 0.12.0"
   },
   "scripts": {
-    "test": "npm run jshint && npm run mocha",
     "jshint": "jshint src/. test/. --config",
-    "start": "nodemon src/",
-    "mocha": "mocha test/ --recursive"
+    "start": "node src/",
   },
   "dependencies": {
     "body-parser": "^1.15.2",
