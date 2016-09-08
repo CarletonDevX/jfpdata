@@ -1,7 +1,6 @@
 'use strict';
 const jobs = require('./jobs');
-const authentication = require('./authentication');
-const user = require('./user');
+
 const mongoose = require('mongoose');
 module.exports = function() {
   const app = this;
@@ -9,7 +8,5 @@ module.exports = function() {
   mongoose.connect(app.get('mongodb'));
   mongoose.Promise = global.Promise;
 
-  app.configure(authentication);
-  app.configure(user);
   app.configure(jobs);
 };

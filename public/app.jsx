@@ -105,15 +105,8 @@ const PrinterConsole = React.createClass({
   }
 });
 
-app.authenticate().then(() => {
-  ReactDOM.render(<div>
+ReactDOM.render(
+  <div>
     <MainComponent />
   </div>, document.querySelector("#container"));
-}).catch(error => {
-  if(error.code === 401) {
-    window.location.href = '/login.html'
-  }
-  console.error(error);
-});
-
 
