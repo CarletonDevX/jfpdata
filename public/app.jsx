@@ -11,7 +11,7 @@ const app = feathers()
 const MainComponent = React.createClass({
   getInitialState() {
     app.service('jobs').find({}).then(res => this.setState({ jobs: res.data }));
-    return {jobs: []};
+    return {jobs: [], hideSuccessful: false};
   },
   addJob(job) {
     app.service('jobs').create(job).then(job => {
@@ -20,11 +20,15 @@ const MainComponent = React.createClass({
       this.setState({ jobs: jobs });
     });
   },
+  toggleSuccessful(e) {
+    this.setState({ hideSuccessful: (!this.state.hideSuccessful) });
+  },
   render() {
     return (
       <div>
         <h1 className="title"> JFP Data </h1>
-        <JobTable jobs={this.state.jobs}/>
+        <JobTable jobs={this.state.jobs} hideSuccessful={this.state.hideSuccessful}/>
+        <button type="button" className="pure-button" onClick={this.toggleSuccessful}> {this.state.hideSuccessful? "Show Successful Requests": "Hide Successful Requests"} </button>
         <PrinterConsole onSubmit={this.addJob}/>
       </div>
     );
@@ -38,26 +42,30 @@ const JobTable = React.createClass({
   },
   render() {
     return (
-      <table className="printer-table pure-table pure-table-striped">
-        <thead>
-          <tr>
-            <th>Printer</th>
-            <th>Copies</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.props.jobs.map((job, index) => {
-            return (
-              <tr key={index}>
-                  <td>{job.printer}</td>
-                  <td>{job.copies}</td>
-                  <td>{this.formatTime(job.createdAt)}</td>
-              </tr>
-            );
-          }, this)}
-        </tbody>
-      </table>
+      <div className="printer-table-container">
+        <table className="printer-table pure-table pure-table-striped">
+          <thead>
+            <tr>
+              <th>Printer</th>
+              <th>Copies</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.props.jobs.map((job, index) => {
+              if (!job.success || !this.props.hideSuccessful) {
+                return (
+                    <tr key={index} className={job.success ? "" : "error-job"}>
+                        <td>{job.printer}</td>
+                        <td>{job.copies}</td>
+                        <td>{this.formatTime(job.createdAt)}</td>
+                    </tr>
+                  );
+                }
+            }, this)}
+          </tbody>
+        </table>
+      </div>
     );
   }
 });
